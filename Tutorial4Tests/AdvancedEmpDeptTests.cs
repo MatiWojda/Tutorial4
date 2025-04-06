@@ -39,6 +39,8 @@ public class AdvancedEmpDeptTests
             .ToList();
         
         Assert.Equal(2, firstTwo.Count);
+        Assert.Equal("SMITH", firstTwo[0].EName);
+        Assert.Equal("ALLEN", firstTwo[1].EName);
         Assert.True(firstTwo[0].HireDate <= firstTwo[1].HireDate);
     }
 
@@ -53,8 +55,10 @@ public class AdvancedEmpDeptTests
         .Distinct()
             .ToList();
         
+        Assert.Equal(3, jobs.Count);
         Assert.Contains("PRESIDENT", jobs);
         Assert.Contains("SALESMAN", jobs);
+        Assert.Contains("CLERK", jobs);
     }
 
     // 15. Employees with managers (NOT NULL Mgr)
@@ -67,7 +71,9 @@ public class AdvancedEmpDeptTests
         var withMgr = emps.Where(e => e.Mgr.HasValue)
             .ToList();
         
+        Assert.Equal(4, withMgr.Count);
         Assert.All(withMgr, e => Assert.NotNull(e.Mgr));
+        Assert.DoesNotContain(withMgr, e => e.EName == "KING");
     }
 
     // 16. All employees earn more than 500
@@ -113,7 +119,9 @@ public class AdvancedEmpDeptTests
                 })
             .ToList();
         
+        Assert.Equal(2, result.Count);
         Assert.Contains(result, r => r.Employee == "SMITH" && r.Manager == "FORD");
+        Assert.Contains(result, r => r.Employee == "FORD" && r.Manager == "KING");
     }
 
     // 19. Let clause usage (sal + comm)
@@ -134,6 +142,9 @@ public class AdvancedEmpDeptTests
         Assert.Equal(5, result.Count);
         
         Assert.Contains(result, r => r.EName == "ALLEN" && r.Total == 1900);
+        Assert.Contains(result, r => r.EName == "WARD" && r.Total == 1750);
+        Assert.Contains(result, r => r.EName == "SMITH" && r.Total == 800);
+        Assert.Contains(result, r => r.EName == "KING" && r.Total == 5000);
     }
 
     // 20. Join all three: Emp → Dept → Salgrade
@@ -160,6 +171,12 @@ public class AdvancedEmpDeptTests
                 }))
             .ToList();
         
+        Assert.Equal(5, result.Count);
+        
         Assert.Contains(result, r => r.EName == "ALLEN" && r.DName == "SALES" && r.Grade == 3);
+        Assert.Contains(result, r => r.EName == "SMITH" && r.DName == "RESEARCH" && r.Grade == 1);
+        Assert.Contains(result, r => r.EName == "WARD" && r.DName == "SALES" && r.Grade == 2);
+        Assert.Contains(result, r => r.EName == "KING" && r.DName == "ACCOUNTING" && r.Grade == 5);
+        Assert.Contains(result, r => r.EName == "FORD" && r.DName == "ACCOUNTING" && r.Grade == 5);
     }
 }

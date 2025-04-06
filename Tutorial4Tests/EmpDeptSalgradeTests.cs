@@ -10,7 +10,8 @@ public class EmpDeptSalgradeTests
         var emps = Database.GetEmps();
 
         List<Emp> result = emps.Where(e => e.Job == "SALESMAN").ToList();
-
+        
+        Assert.NotNull(result);
         Assert.Equal(2, result.Count);
         Assert.All(result, e => Assert.Equal("SALESMAN", e.Job));
     }
@@ -25,8 +26,11 @@ public class EmpDeptSalgradeTests
         List<Emp> result = emps.Where(e => e.DeptNo == 30)
             .OrderByDescending(e => e.Sal)
             .ToList();
-
+        
+        Assert.NotNull(result);
         Assert.Equal(2, result.Count);
+        Assert.Equal("ALLEN", result[0].EName);
+        Assert.Equal("WARD", result[1].EName);
         Assert.True(result[0].Sal >= result[1].Sal);
     }
 
@@ -44,7 +48,9 @@ public class EmpDeptSalgradeTests
 
         List<Emp> result = emps.Where(e => chicagoDeptNos.Contains(e.DeptNo))
             .ToList();
-
+        
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Count);
         Assert.All(result, e => Assert.Equal(30, e.DeptNo));
     }
 
@@ -57,11 +63,14 @@ public class EmpDeptSalgradeTests
 
         var result = emps.Select(e => new { e.EName, e.Sal }).ToList();
         
+        Assert.NotNull(result);
+        Assert.Equal(5, result.Count);
         Assert.All(result, r => 
         {
             Assert.False(string.IsNullOrWhiteSpace(r.EName));
             Assert.True(r.Sal > 0); 
         });
+        Assert.Contains(result, r => r.EName == "KING" && r.Sal == 5000);
     }
 
     // 5. JOIN Emp to Dept
@@ -81,8 +90,12 @@ public class EmpDeptSalgradeTests
                     dept.DName
                 })
             .ToList();
-
+        
+        Assert.NotNull(result);
+        Assert.Equal(5, result.Count);
         Assert.Contains(result, r => r.DName == "SALES" && r.EName == "ALLEN");
+        Assert.Contains(result, r => r.DName == "RESEARCH" && r.EName == "SMITH");
+        Assert.Contains(result, r => r.DName == "ACCOUNTING" && r.EName == "KING");
     }
 
     // 6. Group by DeptNo
@@ -100,6 +113,10 @@ public class EmpDeptSalgradeTests
             })
             .ToList();
         
+        Assert.NotNull(result);
+        Assert.Equal(3, result.Count);
+        Assert.Contains(result, g => g.DeptNo == 10 && g.Count == 2);
+        Assert.Contains(result, g => g.DeptNo == 20 && g.Count == 1);
         Assert.Contains(result, g => g.DeptNo == 30 && g.Count == 2);
     }
 
@@ -114,7 +131,11 @@ public class EmpDeptSalgradeTests
             .Select(e => new { e.EName, e.Comm })
             .ToList(); 
         
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Count);
         Assert.All(result, r => Assert.NotNull(r.Comm));
+        Assert.Contains(result, r => r.EName == "ALLEN" && r.Comm == 300);
+        Assert.Contains(result, r => r.EName == "WARD" && r.Comm == 500);
     }
 
     // 8. Join with Salgrade
@@ -135,7 +156,13 @@ public class EmpDeptSalgradeTests
                 }))
             .ToList();
         
+        Assert.NotNull(result);
+        Assert.Equal(5, result.Count);
+        Assert.Contains(result, r => r.EName == "SMITH" && r.Grade == 1);
         Assert.Contains(result, r => r.EName == "ALLEN" && r.Grade == 3);
+        Assert.Contains(result, r => r.EName == "WARD" && r.Grade == 2);
+        Assert.Contains(result, r => r.EName == "KING" && r.Grade == 5);
+        Assert.Contains(result, r => r.EName == "FORD" && r.Grade == 5);
     }
 
     // 9. Aggregation (AVG)
@@ -153,6 +180,11 @@ public class EmpDeptSalgradeTests
             })
             .ToList();
         
+        Assert.NotNull(result);
+        Assert.Equal(3, result.Count);
+        Assert.Contains(result, r => r.DeptNo == 10 && r.AvgSal == 5000);
+        Assert.Contains(result, r => r.DeptNo == 20 && r.AvgSal == 800);
+        Assert.Contains(result, r => r.DeptNo == 30 && r.AvgSal == 1425);
         Assert.Contains(result, r => r.DeptNo == 30 && r.AvgSal > 1000);
     }
 
@@ -176,6 +208,12 @@ public class EmpDeptSalgradeTests
             .Select(e => e.EName)
             .ToList();
         
+        Assert.NotNull(result);
+        Assert.Single(result);
         Assert.Contains("ALLEN", result);
+        Assert.DoesNotContain("SMITH", result);
+        Assert.DoesNotContain("WARD", result);
+        Assert.DoesNotContain("KING", result);
+        Assert.DoesNotContain("FORD", result);
     }
 }
